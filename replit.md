@@ -1,6 +1,6 @@
-# [Project name]
+# CertiFlow
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+CertiFlow is a premium Web3 platform frontend for issuing and publicly verifying soulbound academic certificates.
 
 ## Run & Operate
 
@@ -22,23 +22,34 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/certiflow/src/App.tsx` — application shell, routes, and MetaMask wallet state
+- `artifacts/certiflow/src/pages/CertiFlowPages.tsx` — landing, verify, issuer, credentials, and admin pages
+- `artifacts/certiflow/src/components/CertiFlowComponents.tsx` — shared CertiFlow UI components
+- `artifacts/certiflow/src/lib/wallet.ts` — MetaMask provider detection, Sepolia chain ID, and address formatting
+- `artifacts/certiflow/src/data/mockData.ts` — current mock certificate and issuer records
+- `artifacts/certiflow/src/index.css` — CertiFlow visual theme and utility styles
+- `README.md` — GitHub setup, feature, and publishing instructions
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The first release is frontend-only and uses mock data so the full product experience can be reviewed before smart contracts are finalized.
+- MetaMask is accessed through the browser-injected EIP-1193 provider and wrapped with ethers v6 `BrowserProvider`.
+- Sepolia is the required network for issuer actions; the app checks chain ID `11155111` and does not silently switch networks.
+- Wallet state lives in `App.tsx` and is passed to shared navigation and wallet-dependent pages so account and network changes stay synchronized.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+CertiFlow helps institutions issue portable academic credentials, lets students view wallet-owned achievements, and gives anyone a public way to verify a certificate without connecting a wallet. Smart contract integration is intentionally deferred.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Keep the UI premium, responsive, and suitable for a hackathon demo.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- The frontend can run without Replit by using the Vite defaults in `artifacts/certiflow/vite.config.ts`.
+- The credentials and issuer flows are mock interactions until contract reads/writes are added.
+- MetaMask must be installed and the active account must be on Sepolia before the issuer mint action is enabled.
 
 ## Pointers
 
