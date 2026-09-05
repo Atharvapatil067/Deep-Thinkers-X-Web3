@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import {
   ArrowUpRight,
+  CircleAlert,
   Check,
   ChevronDown,
   CircleHelp,
@@ -18,25 +19,44 @@ import {
   X,
 } from 'lucide-react';
 import type { AuthorizedIssuer, Certificate } from '@/data/mockData';
-import { demoWallet } from '@/data/mockData';
+import { SEPOLIA_CHAIN_ID, shortenAddress } from '@/lib/wallet';
 
-export function WalletButton({ connected, onConnect, onDisconnect }: { connected: boolean; onConnect: () => void; onDisconnect: () => void }) {
+export type WalletButtonProps = {
+  connected: boolean;
+  address: string | null;
+  chainId: number | null;
+  isMetaMaskAvailable: boolean;
+  isConnecting: boolean;
+  walletError?: string | null;
+  onConnect: () => void | Promise<void>;
+  onDisconnect: () => void;
+};
+
+export function WalletButton({ connected, address, chainId, isMetaMaskAvailable, isConnecting, walletError, onConnect, onDisconnect }: WalletButtonProps) {
+  const wrongNetwork = connected && chainId !== null && chainId !== SEPOLIA_CHAIN_ID;
   if (connected) {
     return (
+      <div className="flex flex-col items-end gap-1">
       <button type="button" data-testid="button-wallet-disconnect" onClick={onDisconnect} className="cf-focus cf-button inline-flex items-center gap-2 rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-xs font-bold text-cyan-100">
         <span className="grid size-6 place-items-center rounded-lg bg-cyan-300/15 text-cyan-200"><Wallet size={14} /></span>
-        <span className="hidden sm:inline">{demoWallet}</span><ChevronDown size={13} className="text-cyan-200/70" />
+         <span data-testid="text-wallet-address">{address ? shortenAddress(address) : 'Wallet connected'}</span><ChevronDown size={13} className="text-cyan-200/70" />
       </button>
+      {wrongNetwork && <span data-testid="status-wallet-network" className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-200"><CircleAlert size={11} /> Switch to Sepolia Testnet</span>}
+      </div>
     );
   }
   return (
-    <button type="button" data-testid="button-wallet-connect" onClick={onConnect} className="cf-focus cf-button inline-flex items-center gap-2 rounded-xl border border-cyan-300/35 bg-cyan-300/10 px-4 py-2.5 text-sm font-bold text-cyan-100 hover:bg-cyan-300/16">
-      <Wallet size={15} /> Connect wallet
-    </button>
+    <div className="flex flex-col items-end gap-1">
+      <button type="button" data-testid="button-wallet-connect" disabled={isConnecting} onClick={onConnect} className="cf-focus cf-button inline-flex items-center gap-2 rounded-xl border border-cyan-300/35 bg-cyan-300/10 px-4 py-2.5 text-sm font-bold text-cyan-100 hover:bg-cyan-300/16 disabled:cursor-wait disabled:opacity-70">
+        {isConnecting ? <LoaderCircle size={15} className="animate-spin" /> : <Wallet size={15} />} {isConnecting ? 'Connecting...' : 'Connect MetaMask'}
+      </button>
+      {!isMetaMaskAvailable && <span data-testid="status-metamask-unavailable" className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-200"><CircleAlert size={11} /> MetaMask unavailable</span>}
+      {walletError && isMetaMaskAvailable && <span data-testid="status-wallet-error" className="max-w-[230px] text-right text-[10px] font-semibold text-rose-200">{walletError}</span>}
+    </div>
   );
 }
 
-export function Navbar({ walletConnected, onConnect, onDisconnect }: { walletConnected: boolean; onConnect: () => void; onDisconnect: () => void }) {
+export function Navbar({ walletConnected, walletAddress, walletChainId, isMetaMaskAvailable, isConnecting, walletError, onConnect, onDisconnect }: Omit<WalletButtonProps, 'connected' | 'address' | 'chainId'> & { walletConnected: boolean; walletAddress: string | null; walletChainId: number | null }) {
   const [open, setOpen] = useState(false);
   const links = [
     { to: '/verify', label: 'Verify' },
@@ -54,14 +74,14 @@ export function Navbar({ walletConnected, onConnect, onDisconnect }: { walletCon
         <nav className="hidden items-center gap-7 md:flex">
           {links.map((link) => <NavLink key={link.to} to={link.to} data-testid={`link-nav-${link.label.toLowerCase().replaceAll(' ', '-')}`} className={({ isActive }) => `cf-focus text-sm transition-colors ${isActive ? 'text-cyan-200' : 'text-slate-400 hover:text-slate-100'}`}>{link.label}</NavLink>)}
         </nav>
-        <div className="hidden md:block"><WalletButton connected={walletConnected} onConnect={onConnect} onDisconnect={onDisconnect} /></div>
+        <div className="hidden md:block"><WalletButton connected={walletConnected} address={walletAddress} chainId={walletChainId} isMetaMaskAvailable={isMetaMaskAvailable} isConnecting={isConnecting} walletError={walletError} onConnect={onConnect} onDisconnect={onDisconnect} /></div>
         <button type="button" data-testid="button-mobile-menu" onClick={() => setOpen(!open)} className="cf-focus rounded-lg p-2 text-slate-300 md:hidden">{open ? <X size={21} /> : <Menu size={21} />}</button>
       </div>
       {open && <div className="border-t border-white/[.07] px-5 pb-5 pt-3 md:hidden">
         <nav className="flex flex-col gap-1">
           {links.map((link) => <NavLink onClick={() => setOpen(false)} key={link.to} to={link.to} data-testid={`link-mobile-${link.label.toLowerCase().replaceAll(' ', '-')}`} className="rounded-lg px-3 py-3 text-sm text-slate-300 hover:bg-white/[.05]">{link.label}</NavLink>)}
         </nav>
-        <div className="mt-3"><WalletButton connected={walletConnected} onConnect={onConnect} onDisconnect={onDisconnect} /></div>
+        <div className="mt-3"><WalletButton connected={walletConnected} address={walletAddress} chainId={walletChainId} isMetaMaskAvailable={isMetaMaskAvailable} isConnecting={isConnecting} walletError={walletError} onConnect={onConnect} onDisconnect={onDisconnect} /></div>
       </div>}
     </header>
   );
