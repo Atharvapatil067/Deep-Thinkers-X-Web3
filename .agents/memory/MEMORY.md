@@ -1,0 +1,1 @@
+- [Issuer wallet authorization](issuer-wallet-authorization.md) — compare real MetaMask addresses case-insensitively; mock display strings cannot authorize accounts.
