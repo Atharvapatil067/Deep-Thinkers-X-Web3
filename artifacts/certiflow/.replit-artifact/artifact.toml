@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "CertiFlow"
+description = "A premium Web3 platform UI for issuing, managing, and publicly verifying soulbound academic certificates on-chain."
+version = "1.0.0"
+id = "artifacts/certiflow"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21166
+
+[services.development]
+run = "pnpm --filter @workspace/certiflow run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/certiflow", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/certiflow/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21166"
+BASE_PATH = "/"
