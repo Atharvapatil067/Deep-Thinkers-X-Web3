@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # CertiFlow
 
 CertiFlow is a premium Web3 academic credential frontend for issuing, managing, and publicly verifying soulbound certificates.
@@ -129,3 +130,7 @@ git push -u origin main
 ```
 
 Do not commit `node_modules`, build output, `.env` files, or private keys. The repository `.gitignore` already excludes generated dependencies and build artifacts.
+=======
+# hackblox
+this is our hackblox project
+>>>>>>> 5a051de8793f1dda079b45243ea88c19bce55537
