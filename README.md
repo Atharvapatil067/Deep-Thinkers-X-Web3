@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # CertiFlow
 
 CertiFlow is a premium Web3 academic credential frontend for issuing, managing, and publicly verifying soulbound certificates.
